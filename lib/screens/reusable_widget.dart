@@ -9,9 +9,9 @@ Image logoWidget(String imageName) {
   );
 }
 
-TextField reusableTextField(String text, IconData icon, bool isPasswordType,
+TextFormField reusableTextField(String text, IconData icon, bool isPasswordType,
     TextEditingController? controller) {
-  return TextField(
+  return TextFormField(
     controller: controller,
     obscureText: isPasswordType,
     enableSuggestions: !isPasswordType,
@@ -34,7 +34,31 @@ TextField reusableTextField(String text, IconData icon, bool isPasswordType,
     ),
     keyboardType: isPasswordType
         ? TextInputType.visiblePassword
+
         : TextInputType.emailAddress,
+  );
+}
+
+SnackBar reusableSnackBar(String text, Color? snackBarColor){
+  return SnackBar(
+    content: Container(
+        padding: EdgeInsets.all(16),
+        // height: 90,
+        decoration: BoxDecoration(
+          color: snackBarColor,
+          borderRadius: BorderRadius.all(Radius.circular(20)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Icon(Icons.check, color: Colors.white,),
+            SizedBox(width: 10),
+            Text(text, style: TextStyle(fontSize: 18, color: Colors.white)),
+          ],
+        )
+    ),
+    backgroundColor: Colors.transparent,
+    elevation: 0,
   );
 }
 

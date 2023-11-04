@@ -6,6 +6,7 @@ import 'package:flutter_application_1/screens/reusable_widget.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../UserChatBox/utils/constants.dart';
 import '../home-pages/home.dart';
+import 'password_text_form_field.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key, required this.isRegistering}) : super(key: key);
@@ -30,10 +31,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _usernameController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
 
-  // TextEditingController _passwordTextController = TextEditingController();
-  // TextEditingController _emailTextController = TextEditingController();
-  // TextEditingController _userNameTextController = TextEditingController();
 
   Future<void> _signUp() async {
     final isValid = _formKey.currentState!.validate();
@@ -46,8 +45,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
     try {
       await supabase.auth.signUp(
           email: email, password: password, data: {'username': username});
-      // Navigator.pushReplacementNamed(context, '/userHome');
-      Navigator.push(context, MaterialPageRoute(builder: (context) => Myhome()));
+      // Navigator.pushNamedAndRemoveUntil(context, '/userHome', (Route<dynamic> route) => false);
+      Navigator.pushAndRemoveUntil( context, MaterialPageRoute(builder: (context) => Myhome()),
+              (Route<dynamic> route) => false
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        reusableSnackBar('Sign Up Successful', Colors.green),
+      );
     } on AuthException catch (error) {
       context.showErrorSnackBar(message: error.message);
     } catch (error) {
@@ -97,15 +101,49 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   const SizedBox(
                     height: 20,
                   ),
-                  reusableTextField("Enter Password", Icons.lock_outlined, true, null),
+                  // reusableTextField("Enter Password", Icons.lock_outlined, true, null),
+                  // const SizedBox(
+                  //   height: 20,
+                  // ),
+                  // reusableTextField("Confirm Your Password", Icons.lock_outlined, true,
+                  //     _passwordController),
+                  // const SizedBox(
+                  //   height: 20,
+                  // ),
+                  PasswordTextFormField(
+                    labelText: 'Password',
+                    passwordEditingController: _passwordController,
+                    validator: (value) {
+                      if (value?.isEmpty ?? true) {
+                        return 'Enter password.';
+                      } else if (value!.length < 8) {
+                        return 'Password must be at least 8 characters.';
+                      }
+                      return null;
+                    },
+                  ),
                   const SizedBox(
                     height: 20,
                   ),
-                  reusableTextField("Confirm Your Password", Icons.lock_outlined, true,
-                      _passwordController),
+
+                  PasswordTextFormField(
+                    labelText: 'Confirm Password',
+                    passwordEditingController: _confirmPasswordController,
+                    validator: (value) {
+                      if (value?.isEmpty ?? true) {
+                        return 'Enter confirm password.';
+                      } else if (value!.length < 8) {
+                        return 'Password must be at least 8 characters.';
+                      } else if (value != _passwordController.text) {
+                        return 'Password and Confirm Password must be match.';
+                      }
+                      return null;
+                    },
+                  ),
                   const SizedBox(
                     height: 20,
                   ),
+
                   reusableTextField("Enter Phone Number", Icons.phone, false, null),
                   const SizedBox(
                     height: 20,
@@ -121,7 +159,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     margin: const EdgeInsets.fromLTRB(0, 10, 0, 20),
                     decoration: BoxDecoration(borderRadius: BorderRadius.circular(90)),
                     child: ElevatedButton(
-                      onPressed: _isLoading ? null : _signUp,
+                      onPressed: _signUp,
                       child: Text(
                         "Sign Up",
                         style: const TextStyle(

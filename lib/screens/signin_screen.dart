@@ -6,6 +6,7 @@ import 'package:flutter_application_1/screens/reset_password.dart';
 import 'package:flutter_application_1/screens/reusable_widget.dart';
 import 'package:flutter_application_1/screens/signup_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'password_text_form_field.dart';
 import '../UserChatBox/utils/constants.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -31,7 +32,12 @@ class _SignInScreenState extends State<SignInScreen> {
         email: _emailController.text,
         password: _passwordController.text,
       );
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Myhome()));
+      Navigator.pushAndRemoveUntil( context, MaterialPageRoute(builder: (context) => Myhome()),
+              (Route<dynamic> route) => false
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        reusableSnackBar('Sign In Successful', Colors.green),
+      );
       //   Navigator.push(context,
       //       MaterialPageRoute(builder: (context) => HomeScreen()));
     } on AuthException catch (error) {
@@ -80,8 +86,18 @@ class _SignInScreenState extends State<SignInScreen> {
                   const SizedBox(
                     height: 20,
                   ),
-                  reusableTextField("Enter Password", Icons.lock_outline, true,
-                      _passwordController),
+                  // reusableTextField("Enter Password", Icons.lock_outline, true,
+                  //     _passwordController),
+                  PasswordTextFormField(
+                    labelText: 'Password',
+                    passwordEditingController: _passwordController,
+                    validator: (value) {
+                      if (value?.isEmpty ?? true) {
+                        return 'Enter password.';
+                      }
+                      return null;
+                    },
+                  ),
                   const SizedBox(
                     height: 5,
                   ),
@@ -92,7 +108,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   margin: const EdgeInsets.fromLTRB(0, 10, 0, 20),
                   decoration: BoxDecoration(borderRadius: BorderRadius.circular(90)),
                   child: ElevatedButton(
-                    onPressed: _isLoading ? null : _signIn,
+                    onPressed: _signIn,
                     child: Text(
                       "SIGN IN",
                       style: const TextStyle(
